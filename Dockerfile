@@ -36,11 +36,6 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
 # Install Gulp
 RUN npm install -g gulp
 
-# Install Drupal Console
-#RUN curl http://drupalconsole.com/installer -L -o drupal.phar
-#RUN mv drupal.phar /usr/local/bin/drupal && chmod +x /usr/local/bin/drupal
-#RUN drupal init
-
 # TODO: Why does this break (slow down) drush (name, import of DB)???
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
