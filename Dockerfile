@@ -22,9 +22,19 @@ RUN apt-get update && apt-get install -y --fix-missing \
         libnotify-bin \
         sendmail \
         rsyslog \
+        gcc \
+        make \
+        autoconf \
+        libc-dev \
+        libpcre3-dev \
+        pkg-config \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
 	&& docker-php-ext-install gd mbstring opcache pdo pdo_mysql zip bcmath pcntl
+
+# Install Oauth support
+RUN pecl install oauth \
+    && echo 'extension=oauth.so' >> /usr/local/etc/php/conf.d/oauth.ini
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
