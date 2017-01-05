@@ -57,7 +57,20 @@ RUN npm install -g gulp
 #opcache.enable_cli=1\n"\
 #>> /usr/local/etc/php/conf.d/opcache-recommended.ini
 
+# Configure Sendmail
 RUN echo 'sendmail_path = /usr/sbin/sendmail -t -i' >> /usr/local/etc/php/conf.d/sendmail.ini
+
+# Add crontab file in the cron directory
+ADD crontab /etc/cron.d/drupal-cron
+
+# Give execution rights on the cron job
+RUN chmod 0644 /etc/cron.d/drupal-cron
+
+# Create the log file to be able to run tail
+RUN touch /var/log/cron.log
+
+# Run the command on container startup
+CMD cron && tail -f /var/log/cron.log
 
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
