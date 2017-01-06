@@ -61,7 +61,7 @@ RUN npm install -g gulp
 RUN echo 'sendmail_path = /usr/sbin/sendmail -t -i' >> /usr/local/etc/php/conf.d/sendmail.ini
 
 # Add crontab file in the cron directory
-ADD cnf/crontab /etc/cron.d/drupal-cron
+COPY cnf/crontab /etc/cron.d/drupal-cron
 
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/drupal-cron
