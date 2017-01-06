@@ -70,7 +70,7 @@ RUN chmod 0644 /etc/cron.d/drupal-cron
 RUN touch /var/log/cron.log
 
 # Run the command on container startup
-CMD cron && tail -f /var/log/cron.log
+CMD cron
 
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
