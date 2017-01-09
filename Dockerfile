@@ -49,6 +49,10 @@ RUN npm install -g gulp
 # Install Bower
 RUN npm install -g bower
 
+# Install MIME extensions
+RUN pear install -a Mail_Mime
+RUN pear install Mail_mimeDecode
+
 # TODO: Why does this break (slow down) drush (name, import of DB)???
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
