@@ -46,6 +46,10 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
 # Install Gulp
 RUN npm install -g gulp
 
+# Install MIME extensions
+RUN pear install -a Mail_Mime
+RUN pear install Mail_mimeDecode
+
 # TODO: Why does this break (slow down) drush (name, import of DB)???
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
