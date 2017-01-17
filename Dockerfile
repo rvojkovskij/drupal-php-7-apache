@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install -y --fix-missing \
         pkg-config \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-	&& docker-php-ext-install gd mbstring opcache pdo pdo_mysql zip bcmath pcntl
+	&& docker-php-ext-install gd mbstring opcache pdo pdo_mysql zip bcmath pcntl mysqli
 
 # Install Oauth support
 RUN pecl install oauth \
