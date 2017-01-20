@@ -79,21 +79,4 @@ RUN touch /var/log/cron.log
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Setup user www-data and group www-data
-RUN groupmod -g 82 www-data && \
-	usermod -u 82 -s /bin/bash -g www-data www-data
-
-# Create work dir
-RUN mkdir -p /var/www && \
-    chown -R www-data:www-data /var/www
-
 WORKDIR /var/www
-VOLUME /var/www
-EXPOSE 9000
-
-# Init www-data user
-USER www-data
-RUN composer global require hirak/prestissimo:^0.3 --optimize-autoloader && \
-    rm -rf ~/.composer/.cache
-
-USER root
