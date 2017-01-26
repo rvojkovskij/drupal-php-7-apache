@@ -8,6 +8,10 @@ EXPOSE 80
 
 RUN a2enmod rewrite
 
+RUN mkdir /etc/apache2/certs
+
+RUN a2enmod ssl
+
 RUN service apache2 restart
 
 # install the PHP extensions we need
