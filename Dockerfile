@@ -6,7 +6,7 @@ COPY cnf/php.ini /usr/local/etc/php/
 
 EXPOSE 80
 
-RUN a2enmod rewrite headers
+RUN a2enmod rewrite headers expires
 
 RUN service apache2 restart
 
