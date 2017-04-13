@@ -27,8 +27,11 @@ RUN apt-get update && apt-get install -y --fix-missing \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
 	&& docker-php-ext-install gd mbstring opcache pdo pdo_mysql zip bcmath pcntl mysqli \
-    && a2enmod rewrite headers expires rsyslog \
-    && service apache2 restart
+	&& apt-get autoclean -y \
+	&& apt-get clean -y \
+	&& apt-get autoremove -y \
+  && a2enmod rewrite headers expires \
+  && service apache2 restart
 
 # Install Oauth support
 RUN pecl install oauth \
