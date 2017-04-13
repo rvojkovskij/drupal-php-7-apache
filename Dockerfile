@@ -6,10 +6,6 @@ COPY cnf/php.ini /usr/local/etc/php/
 
 EXPOSE 80
 
-RUN a2enmod rewrite headers expires
-
-RUN service apache2 restart
-
 # install the PHP extensions we need
 RUN apt-get update && apt-get install -y --fix-missing \
         apt-utils \
@@ -30,7 +26,9 @@ RUN apt-get update && apt-get install -y --fix-missing \
         pkg-config \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-	&& docker-php-ext-install gd mbstring opcache pdo pdo_mysql zip bcmath pcntl mysqli
+	&& docker-php-ext-install gd mbstring opcache pdo pdo_mysql zip bcmath pcntl mysqli \
+    && a2enmod rewrite headers expires rsyslog \
+    && service apache2 restart
 
 # Install Oauth support
 RUN pecl install oauth \
@@ -43,15 +41,12 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install -y nodejs
 
-# Install Gulp
-RUN npm install -g gulp
-
-# Install Bower
-RUN npm install -g bower
+# Install Gulp and Bower
+RUN npm install -g gulp bower
 
 # Install MIME extensions
-RUN pear install -a Mail_Mime
-RUN pear install Mail_mimeDecode
+RUN pear install -a Mail_Mime \
+    && pear install Mail_mimeDecode
 
 # TODO: Why does this break (slow down) drush (name, import of DB)???
 # set recommended PHP.ini settings
@@ -71,10 +66,9 @@ RUN echo 'sendmail_path = /usr/sbin/sendmail -t -i' >> /usr/local/etc/php/conf.d
 COPY cnf/crontab /etc/cron.d/drupal-cron
 
 # Give execution rights on the cron job
-RUN chmod 0644 /etc/cron.d/drupal-cron
-
-# Create the log file to be able to run tail
-RUN touch /var/log/cron.log
+RUN chmod 0644 /etc/cron.d/drupal-cron \
+    # Create the log file to be able to run tail
+    && touch /var/log/cron.log
 
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
