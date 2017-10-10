@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+echo "Using Let's Encrypt Certbot"
+certbot -n --expand --apache --agree-tos --email "devuser@pmmimediagroup.com" "$@"

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+LETSENCRYPT_HOME="${LETSENCRYPT_HOME}/live"
+DOMAINS=${DOMAINS}
+SSL=${SSL}
+
+[ ! -d ${LETSENCRYPT_HOME} ] ; LETSENCRYPT_NOT_EXIST=$?
+[ ! "$(ls -A ${LETSENCRYPT_HOME})" ] ; LETSENCRYPT_NO_FILES=$?
+[ "$(ls -A ${LETSENCRYPT_HOME})" = ".gitkeep" ] ; LETSENCRYPT_ONLY_GITKEEP=$?
+
+[ ${LETSENCRYPT_NOT_EXIST} = 0 ] || [ ${LETSENCRYPT_NO_FILES} = 0 ] || [ ${LETSENCRYPT_ONLY_GITKEEP} = 0 ] ; LETSENCRYPT_EMPTY=$?
+
+echo ${LETSENCRYPT_EMPTY}
+
+[ "${SSL}" = "true" ] || [ "${SSL}" = 1 ] ; SSL_TRUE=$?
+
+# init only if certbot is running for the first time and if DOMAINS was set
+if [ ${LETSENCRYPT_EMPTY} = 0 ] && [ ! -z "$DOMAINS" ] && [ ${SSL_TRUE} = 0 ]; then
+    eval pmg-run-certbot --domains ${DOMAINS}
+# if certbot doesn't need to run, but SSL is being used, then we probably need to enable the ssl
+# v-host (b/c the symlink with sites-enabled probably didn't persist during container restarts).
+elif [ ! -z "$DOMAINS" ] && [ ${SSL_TRUE} = 0 ]; then
+    a2ensite default-ssl
+    service apache2 stop # using 'stop' instead of 'restart' b/c supervisord automatically restarts.
+fi
