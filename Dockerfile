@@ -3,11 +3,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 ENV LETSENCRYPT_HOME /etc/letsencrypt
 
-#COPY cnf/php.ini /usr/local/etc/php/
-
-#EXPOSE 80
-
-# install the PHP extensions we need
 RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/sources.list \
     && curl -sS http://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && echo "deb http://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
@@ -24,25 +19,18 @@ RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/so
         sendmail \
         rsyslog \
         autoconf \
-#        python-certbot-apache \
         supervisor \
-#	&& rm -rf /var/lib/apt/lists/* \
 	&& docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
 	&& docker-php-ext-install gd mbstring opcache pdo pdo_mysql zip bcmath pcntl mysqli \
     && a2enmod rewrite headers expires ssl actions \
-#    && service apache2 restart \
     && apt-get install -y python-certbot-apache -t jessie-backports \
-    # Install latest NPM and Node.js
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install -y nodejs \
-    # Install Gulp and Bower
     && npm install -g gulp bower \
     && apt-get install yarn \
-    # Install MIME extensions
     && pear install -a Mail_Mime \
     && pear install Mail_mimeDecode \
-    # Install Oauth support
-    && pecl install oauth \
+    && pecl install oauth uploadprogress \
     && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php -r "if (hash_file('SHA384', 'composer-setup.php') === '544e09ee996cdf60ece3804abc52599c22b1f40f4323403c44d44fdfdd586475ca9813a858088ffbc1f233e9b180f061') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
@@ -68,32 +56,6 @@ RUN ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log"
 COPY config/supervisord.conf /etc/supervisor/supervisord.conf
 COPY config/scripts/pmg-* /usr/local/bin/
 RUN chmod +x /usr/local/bin/pmg-*
-
-# Install Composer
-# RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-
-# TODO: Why does this break (slow down) drush (name, import of DB)???
-# set recommended PHP.ini settings
-# see https://secure.php.net/manual/en/opcache.installation.php
-#RUN echo "opcache.memory_consumption=128\n\
-#opcache.interned_strings_buffer=8\n\
-#opcache.max_accelerated_files=4000\n\
-#opcache.revalidate_freq=60\n\
-#opcache.fast_shutdown=1\n\
-#opcache.enable_cli=1\n"\
-#>> /usr/local/etc/php/conf.d/opcache-recommended.ini
-
-# Configure Sendmail
-#RUN echo 'sendmail_path = /usr/sbin/sendmail -t -i' >> /usr/local/etc/php/conf.d/sendmail.ini
-
-# Add crontab file in the cron directory
-#COPY cnf/crontab /etc/cron.d/drupal-cron
-
-# Give execution rights on the cron job
-#RUN chmod 0644 /etc/cron.d/drupal-cron \
-#    # Create the log file to be able to run tail
-#    && touch /var/log/cron.log
 
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
