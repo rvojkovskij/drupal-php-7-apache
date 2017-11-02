@@ -1,0 +1,22 @@
+FROM pmguser/drupal-php7.0-apache:latest
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Install blackfire 'probe' @see https://blackfire.io/docs/integrations/docker
+RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
+  && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/$version \
+  && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
+  && mv /tmp/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so \
+  && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
+  # Install PHPUnit
+  && curl -sSL https://phar.phpunit.de/phpunit.phar -o phpunit.phar \
+  && chmod +x phpunit.phar \
+  && mv phpunit.phar /usr/local/bin/phpunit
+
+# sSMTP: note php is configured to use ssmtp, which is configured to send to
+# pximail:1025, which is standard configuration for a mailhog/mailhog image
+# with hostname mail.
+RUN apt-get update
+RUN apt-get install ssmtp --fix-missing -y
+COPY ./config/ssmtp/ssmtp.conf /etc/ssmtp/ssmtp.conf
+
+RUN apt-get autoremove -y
