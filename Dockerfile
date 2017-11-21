@@ -20,8 +20,9 @@ RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/so
         rsyslog \
         autoconf \
         supervisor \
+        libxml2-dev \
 	&& docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-	&& docker-php-ext-install gd mbstring opcache pdo pdo_mysql zip bcmath pcntl mysqli \
+	&& docker-php-ext-install gd mbstring opcache pdo pdo_mysql zip bcmath pcntl mysqli soap \
     && a2enmod rewrite headers expires ssl actions \
     && apt-get install -y python-certbot-apache -t jessie-backports \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
