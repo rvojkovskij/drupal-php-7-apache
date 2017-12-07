@@ -38,11 +38,6 @@ RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/so
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 644 /etc/cron.d/* \
     && chown -R root:root /etc/cron.d/* \
-    && echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections \
-    && echo "postfix postfix/mailname string $(hostname -f)" | debconf-set-selections \
-    && apt-get install -y postfix \
-    && postconf -e "inet_interfaces = loopback-only" \
-    && postconf -e "debug_peer_level = 2" \
 	&& apt-get autoclean -y \
 	&& apt-get clean -y \
 	&& apt-get autoremove -y
