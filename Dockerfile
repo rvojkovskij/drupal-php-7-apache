@@ -18,11 +18,22 @@ RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/so
         libnotify-bin \
         sendmail \
         rsyslog \
+        gcc \
+        make \
         autoconf \
+        libc-dev \
+        libpcre3-dev \
+        pkg-config \
         supervisor \
         libxml2-dev \
+    && apt-get install -y build-essential patch \
+    # https://github.com/docker-library/php/issues/105#issuecomment-196273150
+    && apt-get install -y libmagickwand-dev --no-install-recommends \
+    && mkdir -p /var/log/supervisor \
+    && pecl install imagick \
 	&& docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
 	&& docker-php-ext-install gd mbstring opcache pdo pdo_mysql zip bcmath pcntl mysqli soap \
+	&& docker-php-ext-enable imagick \
     && a2enmod rewrite headers expires ssl actions \
     && apt-get install -y python-certbot-apache -t jessie-backports \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
@@ -38,6 +49,12 @@ RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/so
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 644 /etc/cron.d/* \
     && chown -R root:root /etc/cron.d/* \
+    && echo 'sendmail_path = /usr/sbin/sendmail -t -i' >> /usr/local/etc/php/conf.d/sendmail.ini \
+    #&& echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections \
+    #&& echo "postfix postfix/mailname string $(hostname -f)" | debconf-set-selections \
+    #&& apt-get install -y postfix \
+    #&& postconf -e "inet_interfaces = loopback-only" \
+    #&& postconf -e "debug_peer_level = 2" \
 	&& apt-get autoclean -y \
 	&& apt-get clean -y \
 	&& apt-get autoremove -y
