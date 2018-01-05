@@ -1,1 +1,0 @@
-*/5 * * * * root /var/www/vendor/bin/drush --root=/var/www/html --quiet cron

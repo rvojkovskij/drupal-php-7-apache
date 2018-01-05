@@ -1,0 +1,5 @@
+#!/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Run Drupal cron every 5 minutes, quiet
+*/5 * * * * root cd /var/www/html && ../vendor/bin/drush --root=/var/www/html --quiet cron
