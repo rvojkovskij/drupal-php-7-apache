@@ -1,4 +1,4 @@
-FROM php:7.1.10-apache
+FROM php:7.2-apache
 ARG DEBIAN_FRONTEND=noninteractive
 
 ENV LETSENCRYPT_HOME /etc/letsencrypt
@@ -60,8 +60,8 @@ RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/so
 	&& apt-get clean -y \
 	&& apt-get autoremove -y
 
-COPY config/cron/drupal /etc/cron.d/
-RUN chmod 644 /etc/cron.d/*
+#COPY config/cron/drupal /etc/cron.d/
+#RUN chmod 644 /etc/cron.d/*
 
 COPY config/php.ini /usr/local/etc/php
 RUN ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log"
